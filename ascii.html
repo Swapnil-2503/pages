@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Keyword Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        select, input {
+            padding: 10px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        #suggestions {
+            position: absolute;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: white;
+            z-index: 1000;
+            width: calc(100% - 40px);
+            margin-left: 20px;
+            display: none;
+        }
+        #suggestions div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        #suggestions div:hover {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enter Any to Get Full ASCII</h1>
+
+    <label for="typeSelect">Select Type:</label>
+    <select id="typeSelect">
+        <option value="decimal">Decimal</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="binary">Binary</option>
+        <option value="character">Character</option>
+        <option value="description">Description</option>
+    </select>
+
+    <input type="text" id="inputValue" placeholder="Enter value" oninput="showSuggestions()">
+    <div id="suggestions"></div>
+
+    <button onclick="getAsciiInfo()">Get Info</button>
+
+    <div id="result"></div>
+<div id="Complete-Table"></div>
+    <script>
+        const asciiTable = [
+    { decimal: 0, hex: '00', binary: '00000000', character: '', description: 'Null' },
+    { decimal: 1, hex: '01', binary: '00000001', character: '', description: 'Start of Heading' },
+    { decimal: 2, hex: '02', binary: '00000010', character: '', description: 'Start of Text' },
+    { decimal: 3, hex: '03', binary: '00000011', character: '', description: 'End of Text' },
+    { decimal: 4, hex: '04', binary: '00000100', character: '', description: 'End of Transmission' },
+    { decimal: 5, hex: '05', binary: '00000101', character: '', description: 'Enquiry' },
+    { decimal: 6, hex: '06', binary: '00000110', character: '', description: 'Acknowledgment' },
+    { decimal: 7, hex: '07', binary: '00000111', character: '', description: 'Bell' },
+    { decimal: 8, hex: '08', binary: '00001000', character: '', description: 'Backspace' },
+    { decimal: 9, hex: '09', binary: '00001001', character: '\t', description: 'Horizontal Tab' },
+    { decimal: 10, hex: '0A', binary: '00001010', character: '\n', description: 'Line Feed' },
+    { decimal: 11, hex: '0B', binary: '00001011', character: '', description: 'Vertical Tab' },
+    { decimal: 12, hex: '0C', binary: '00001100', character: '', description: 'Form Feed' },
+    { decimal: 13, hex: '0D', binary: '00001101', character: '\r', description: 'Carriage Return' },
+    { decimal: 14, hex: '0E', binary: '00001110', character: '', description: 'Shift Out' },
+    { decimal: 15, hex: '0F', binary: '00001111', character: '', description: 'Shift In' },
+    { decimal: 16, hex: '10', binary: '00010000', character: '', description: 'Data Link Escape' },
+    { decimal: 17, hex: '11', binary: '00010001', character: '', description: 'Device Control 1' },
+    { decimal: 18, hex: '12', binary: '00010010', character: '', description: 'Device Control 2' },
+    { decimal: 19, hex: '13', binary: '00010011', character: '', description: 'Device Control 3' },
+    { decimal: 20, hex: '14', binary: '00010100', character: '', description: 'Device Control 4' },
+    { decimal: 21, hex: '15', binary: '00010101', character: '', description: 'Negative Acknowledgment' },
+    { decimal: 22, hex: '16', binary: '00010110', character: '', description: 'Synchronous Idle' },
+    { decimal: 23, hex: '17', binary: '00010111', character: '', description: 'End of Transmission Block' },
+    { decimal: 24, hex: '18', binary: '00011000', character: '', description: 'Cancel' },
+    { decimal: 25, hex: '19', binary: '00011001', character: '', description: 'End of Medium' },
+    { decimal: 26, hex: '1A', binary: '00011010', character: '', description: 'Substitute' },
+    { decimal: 27, hex: '1B', binary: '00011011', character: '', description: 'Escape' },
+    { decimal: 28, hex: '1C', binary: '00011100', character: '', description: 'File Separator' },
+    { decimal: 29, hex: '1D', binary: '00011101', character: '', description: 'Group Separator' },
+    { decimal: 30, hex: '1E', binary: '00011110', character: '', description: 'Record Separator' },
+    { decimal: 31, hex: '1F', binary: '00011111', character: '', description: 'Unit Separator' },
+    { decimal: 32, hex: '20', binary: '00100000', character: ' ', description: 'Space' },
+    { decimal: 33, hex: '21', binary: '00100001', character: '!', description: 'Exclamation mark' },
+    { decimal: 34, hex: '22', binary: '00100010', character: '"', description: 'Double quote' },
+    { decimal: 35, hex: '23', binary: '00100011', character: '#', description: 'Hash' },
+    { decimal: 36, hex: '24', binary: '00100100', character: '$', description: 'Dollar sign' },
+    { decimal: 37, hex: '25', binary: '00100101', character: '%', description: 'Percent' },
+    { decimal: 38, hex: '26', binary: '00100110', character: '&', description: 'Ampersand' },
+    { decimal: 39, hex: '27', binary: '00100111', character: "'", description: 'Single quote' },
+    { decimal: 40, hex: '28', binary: '00101000', character: '(', description: 'Left parenthesis' },
+    { decimal: 41, hex: '29', binary: '00101001', character: ')', description: 'Right parenthesis' },
+    { decimal: 42, hex: '2A', binary: '00101010', character: '*', description: 'Asterisk' },
+    { decimal: 43, hex: '2B', binary: '00101011', character: '+', description: 'Plus sign' },
+    { decimal: 44, hex: '2C', binary: '00101100', character: ',', description: 'Comma' },
+    { decimal: 45, hex: '2D', binary: '00101101', character: '-', description: 'Minus sign' },
+    { decimal: 46, hex: '2E', binary: '00101110', character: '.', description: 'Period' },
+    { decimal: 47, hex: '2F', binary: '00101111', character: '/', description: 'Slash' },
+    { decimal: 48, hex: '30', binary: '00110000', character: '0', description: 'Digit 0' },
+    { decimal: 49, hex: '31', binary: '00110001', character: '1', description: 'Digit 1' },
+    { decimal: 50, hex: '32', binary: '00110010', character: '2', description: 'Digit 2' },
+    { decimal: 51, hex: '33', binary: '00110011', character: '3', description: 'Digit 3' },
+    { decimal: 52, hex: '34', binary: '00110100', character: '4', description: 'Digit 4' },
+    { decimal: 53, hex: '35', binary: '00110101', character: '5', description: 'Digit 5' },
+    { decimal: 54, hex: '36', binary: '00110110', character: '6', description: 'Digit 6' },
+    { decimal: 55, hex: '37', binary: '00110111', character: '7', description: 'Digit 7' },
+    { decimal: 56, hex: '38', binary: '00111000', character: '8', description: 'Digit 8' },
+    { decimal: 57, hex: '39', binary: '00111001', character: '9', description: 'Digit 9' },
+    { decimal: 58, hex: '3A', binary: '00111010', character: ':', description: 'Colon' },
+    { decimal: 59, hex: '3B', binary: '00111011', character: ';', description: 'Semicolon' },
+    { decimal: 60, hex: '3C', binary: '00111100', character: '<', description: 'Less than' },
+    { decimal: 61, hex: '3D', binary: '00111101', character: '=', description: 'Equal sign' },
+    { decimal: 62, hex: '3E', binary: '00111110', character: '>', description: 'Greater than' },
+    { decimal: 63, hex: '3F', binary: '00111111', character: '?', description: 'Question mark' },
+    { decimal: 64, hex: '40', binary: '01000000', character: '@', description: 'At sign' },
+    { decimal: 65, hex: '41', binary: '01000001', character: 'A', description: 'Uppercase A' },
+    { decimal: 66, hex: '42', binary: '01000010', character: 'B', description: 'Uppercase B' },
+    { decimal: 67, hex: '43', binary: '01000011', character: 'C', description: 'Uppercase C' },
+    { decimal: 68, hex: '44', binary: '01000100', character: 'D', description: 'Uppercase D' },
+    { decimal: 69, hex: '45', binary: '01000101', character: 'E', description: 'Uppercase E' },
+    { decimal: 70, hex: '46', binary: '01000110', character: 'F', description: 'Uppercase F' },
+    { decimal: 71, hex: '47', binary: '01000111', character: 'G', description: 'Uppercase G' },
+    { decimal: 72, hex: '48', binary: '01001000', character: 'H', description: 'Uppercase H' },
+    { decimal: 73, hex: '49', binary: '01001001', character: 'I', description: 'Uppercase I' },
+    { decimal: 74, hex: '4A', binary: '01001010', character: 'J', description: 'Uppercase J' },
+    { decimal: 75, hex: '4B', binary: '01001011', character: 'K', description: 'Uppercase K' },
+    { decimal: 76, hex: '4C', binary: '01001100', character: 'L', description: 'Uppercase L' },
+    { decimal: 77, hex: '4D', binary: '01001101', character: 'M', description: 'Uppercase M' },
+    { decimal: 78, hex: '4E', binary: '01001110', character: 'N', description: 'Uppercase N' },
+    { decimal: 79, hex: '4F', binary: '01001111', character: 'O', description: 'Uppercase O' },
+    { decimal: 80, hex: '50', binary: '01010000', character: 'P', description: 'Uppercase P' },
+    { decimal: 81, hex: '51', binary: '01010001', character: 'Q', description: 'Uppercase Q' },
+    { decimal: 82, hex: '52', binary: '01010010', character: 'R', description: 'Uppercase R' },
+    { decimal: 83, hex: '53', binary: '01010011', character: 'S', description: 'Uppercase S' },
+    { decimal: 84, hex: '54', binary: '01010100', character: 'T', description: 'Uppercase T' },
+    { decimal: 85, hex: '55', binary: '01010101', character: 'U', description: 'Uppercase U' },
+    { decimal: 86, hex: '56', binary: '01010110', character: 'V', description: 'Uppercase V' },
+    { decimal: 87, hex: '57', binary: '01010111', character: 'W', description: 'Uppercase W' },
+    { decimal: 88, hex: '58', binary: '01011000', character: 'X', description: 'Uppercase X' },
+    { decimal: 89, hex: '59', binary: '01011001', character: 'Y', description: 'Uppercase Y' },
+    { decimal: 90, hex: '5A', binary: '01011010', character: 'Z', description: 'Uppercase Z' },
+    { decimal: 91, hex: '5B', binary: '01011011', character: '[', description: 'Left square bracket' },
+    { decimal: 92, hex: '5C', binary: '01011100', character: '\\', description: 'Backslash' },
+    { decimal: 93, hex: '5D', binary: '01011101', character: ']', description: 'Right square bracket' },
+    { decimal: 94, hex: '5E', binary: '01011110', character: '^', description: 'Caret' },
+    { decimal: 95, hex: '5F', binary: '01100000', character: '_', description: 'Underscore' },
+    { decimal: 96, hex: '60', binary: '01100001', character: '`', description: 'Grave accent' },
+    { decimal: 97, hex: '61', binary: '01100010', character: 'a', description: 'Lowercase a' },
+    { decimal: 98, hex: '62', binary: '01100011', character: 'b', description: 'Lowercase b' },
+    { decimal: 99, hex: '63', binary: '01100100', character: 'c', description: 'Lowercase c' },
+    { decimal: 100, hex: '64', binary: '01100101', character: 'd', description: 'Lowercase d' },
+    { decimal: 101, hex: '65', binary: '01100110', character: 'e', description: 'Lowercase e' },
+    { decimal: 102, hex: '66', binary: '01100111', character: 'f', description: 'Lowercase f' },
+    { decimal: 103, hex: '67', binary: '01101000', character: 'g', description: 'Lowercase g' },
+    { decimal: 104, hex: '68', binary: '01101001', character: 'h', description: 'Lowercase h' },
+    { decimal: 105, hex: '69', binary: '01101010', character: 'i', description: 'Lowercase i' },
+    { decimal: 106, hex: '6A', binary: '01101011', character: 'j', description: 'Lowercase j' },
+    { decimal: 107, hex: '6B', binary: '01101100', character: 'k', description: 'Lowercase k' },
+    { decimal: 108, hex: '6C', binary: '01101101', character: 'l', description: 'Lowercase l' },
+    { decimal: 109, hex: '6D', binary: '01101110', character: 'm', description: 'Lowercase m' },
+    { decimal: 110, hex: '6E', binary: '01101111', character: 'n', description: 'Lowercase n' },
+    { decimal: 111, hex: '6F', binary: '01110000', character: 'o', description: 'Lowercase o' },
+    { decimal: 112, hex: '70', binary: '01110001', character: 'p', description: 'Lowercase p' },
+    { decimal: 113, hex: '71', binary: '01110010', character: 'q', description: 'Lowercase q' },
+    { decimal: 114, hex: '72', binary: '01110011', character: 'r', description: 'Lowercase r' },
+    { decimal: 115, hex: '73', binary: '01110100', character: 's', description: 'Lowercase s' },
+    { decimal: 116, hex: '74', binary: '01110101', character: 't', description: 'Lowercase t' },
+    { decimal: 117, hex: '75', binary: '01110110', character: 'u', description: 'Lowercase u' },
+    { decimal: 118, hex: '76', binary: '01110111', character: 'v', description: 'Lowercase v' },
+    { decimal: 119, hex: '77', binary: '01110111', character: 'w', description: 'Lowercase w' },
+    { decimal: 120, hex: '78', binary: '01111000', character: 'x', description: 'Lowercase x' },
+    { decimal: 121, hex: '79', binary: '01111001', character: 'y', description: 'Lowercase y' },
+    { decimal: 122, hex: '7A', binary: '01111010', character: 'z', description: 'Lowercase z' },
+    { decimal: 123, hex: '7B', binary: '01111100', character: '{', description: 'Left curly brace' },
+    { decimal: 124, hex: '7C', binary: '01111101', character: '|', description: 'Vertical bar' },
+    { decimal: 125, hex: '7D', binary: '01111110', character: '}', description: 'Right curly brace' },
+    { decimal: 126, hex: '7E', binary: '01111111', character: '~', description: 'Tilde' },
+    { decimal: 127, hex: '7F', binary: '01111111', character: '', description: 'Delete' },
+    { decimal: 128, hex: '80', binary: '10000000', character: 'Ç', description: 'Latin capital letter C with cedilla' },
+    { decimal: 129, hex: '81', binary: '10000001', character: 'ü', description: 'Latin small letter u with diaeresis' },
+    { decimal: 130, hex: '82', binary: '10000010', character: 'é', description: 'Latin small letter e with acute' },
+    { decimal: 131, hex: '83', binary: '10000011', character: 'â', description: 'Latin small letter a with circumflex' },
+    { decimal: 132, hex: '84', binary: '10000100', character: 'ä', description: 'Latin small letter a with diaeresis' },
+    { decimal: 133, hex: '85', binary: '10000101', character: 'à', description: 'Latin small letter a with grave' },
+    { decimal: 134, hex: '86', binary: '10000110', character: 'å', description: 'Latin small letter a with ring above' },
+    { decimal: 135, hex: '87', binary: '10000111', character: 'ç', description: 'Latin small letter c with cedilla' },
+    { decimal: 136, hex: '88', binary: '10001000', character: 'ê', description: 'Latin small letter e with circumflex' },
+    { decimal: 137, hex: '89', binary: '10001001', character: 'ë', description: 'Latin small letter e with diaeresis' },
+    { decimal: 138, hex: '8A', binary: '10001010', character: 'è', description: 'Latin small letter e with grave' },
+    { decimal: 139, hex: '8B', binary: '10001011', character: 'ï', description: 'Latin small letter i with diaeresis' },
+    { decimal: 140, hex: '8C', binary: '10001100', character: 'î', description: 'Latin small letter i with circumflex' },
+    { decimal: 141, hex: '8D', binary: '10001101', character: 'ì', description: 'Latin small letter i with grave' },
+    { decimal: 142, hex: '8E', binary: '10001110', character: 'Ä', description: 'Latin capital letter A with diaeresis' },
+    { decimal: 143, hex: '8F', binary: '10001111', character: 'Å', description: 'Latin capital letter A with ring above' },
+    { decimal: 144, hex: '90', binary: '10010000', character: 'É', description: 'Latin capital letter E with acute' },
+    { decimal: 145, hex: '91', binary: '10010001', character: 'æ', description: 'Latin small letter ae' },
+    { decimal: 146, hex: '92', binary: '10010010', character: 'Æ', description: 'Latin capital letter AE' },
+    { decimal: 147, hex: '93', binary: '10010011', character: 'ô', description: 'Latin small letter o with circumflex' },
+    { decimal: 148, hex: '94', binary: '10010100', character: 'ö', description: 'Latin small letter o with diaeresis' },
+    { decimal: 149, hex: '95', binary: '10010101', character: 'ò', description: 'Latin small letter o with grave' },
+    { decimal: 150, hex: '96', binary: '10010110', character: 'û', description: 'Latin small letter u with circumflex' },
+    { decimal: 151, hex: '97', binary: '10010111', character: 'ù', description: 'Latin small letter u with grave' },
+    { decimal: 152, hex: '98', binary: '10011000', character: 'ÿ', description: 'Latin small letter y with diaeresis' },
+    { decimal: 153, hex: '99', binary: '10011001', character: 'Ö', description: 'Latin capital letter O with diaeresis' },
+    { decimal: 154, hex: '9A', binary: '10011010', character: 'Ü', description: 'Latin capital letter U with diaeresis' },
+    { decimal: 155, hex: '9B', binary: '10011011', character: '¢', description: 'Cent sign' },
+    { decimal: 156, hex: '9C', binary: '10011100', character: '£', description: 'Pound sign' },
+    { decimal: 157, hex: '9D', binary: '10011101', character: '¥', description: 'Yen sign' },
+    { decimal: 158, hex: '9E', binary: '10011110', character: '₧', description: 'Peseta sign' },
+    { decimal: 159, hex: '9F', binary: '10011111', character: 'ƒ', description: 'Dutch Florin' },
+    { decimal: 160, hex: 'A0', binary: '10100000', character: ' ', description: 'Non-breaking space' },
+    { decimal: 161, hex: 'A1', binary: '10100001', character: '¡', description: 'Inverted exclamation mark' },
+    { decimal: 162, hex: 'A2', binary: '10100010', character: '¤', description: 'Currency sign' },
+    { decimal: 163, hex: 'A3', binary: '10100011', character: '£', description: 'Pound sign' },
+    { decimal: 164, hex: 'A4', binary: '10100100', character: '¤', description: 'Currency sign' },
+    { decimal: 165, hex: 'A5', binary: '10100101', character: '¥', description: 'Yen sign' },
+    { decimal: 166, hex: 'A6', binary: '10100110', character: '¦', description: 'Broken bar' },
+    { decimal: 167, hex: 'A7', binary: '10100111', character: '§', description: 'Section sign' },
+    { decimal: 168, hex: 'A8', binary: '10101000', character: '¨', description: 'Diaeresis' },
+    { decimal: 169, hex: 'A9', binary: '10101001', character: '©', description: 'Copyright sign' },
+    { decimal: 170, hex: 'AA', binary: '10101010', character: 'ª', description: 'Feminine ordinal indicator' },
+    { decimal: 171, hex: 'AB', binary: '10101011', character: '«', description: 'Left-pointing double angle quotation mark' },
+    { decimal: 172, hex: 'AC', binary: '10101100', character: '¬', description: 'Not sign' },
+    { decimal: 173, hex: 'AD', binary: '10101101', character: '­', description: 'Soft hyphen' },
+    { decimal: 174, hex: 'AE', binary: '10101110', character: '®', description: 'Registered sign' },
+    { decimal: 175, hex: 'AF', binary: '10101111', character: '¯', description: 'MACRON' },
+    { decimal: 176, hex: 'B0', binary: '10110000', character: '°', description: 'Degree sign' },
+    { decimal: 177, hex: 'B1', binary: '10110001', character: '±', description: 'Plus-minus sign' },
+    { decimal: 178, hex: 'B2', binary: '10110010', character: '²', description: 'Superscript two' },
+    { decimal: 179, hex: 'B3', binary: '10110011', character: '³', description: 'Superscript three' },
+    { decimal: 180, hex: 'B4', binary: '10110100', character: '´', description: 'Acute accent' },
+    { decimal: 181, hex: 'B5', binary: '10110101', character: 'µ', description: 'Micro sign' },
+    { decimal: 182, hex: 'B6', binary: '10110110', character: '¶', description: 'Pilcrow sign' },
+    { decimal: 183, hex: 'B7', binary: '10110111', character: '·', description: 'Middle dot' },
+    { decimal: 184, hex: 'B8', binary: '10111000', character: '¸', description: 'Cedilla' },
+    { decimal: 185, hex: 'B9', binary: '10111001', character: '¹', description: 'Superscript one' },
+    { decimal: 186, hex: 'BA', binary: '10111010', character: 'º', description: 'Masculine ordinal indicator' },
+    { decimal: 187, hex: 'BB', binary: '10111011', character: '»', description: 'Right-pointing double angle quotation mark' },
+    { decimal: 188, hex: 'BC', binary: '10111100', character: '¼', description: 'Vulgar fraction one quarter' },
+    { decimal: 189, hex: 'BD', binary: '10111101', character: '½', description: 'Vulgar fraction one half' },
+    { decimal: 190, hex: 'BE', binary: '10111110', character: '¾', description: 'Vulgar fraction three quarters' },
+    { decimal: 191, hex: 'BF', binary: '10111111', character: '¿', description: 'Inverted question mark' },
+    { decimal: 192, hex: 'C0', binary: '11000000', character: 'À', description: 'Latin capital letter A with grave' },
+    { decimal: 193, hex: 'C1', binary: '11000001', character: 'Á', description: 'Latin capital letter A with acute' },
+    { decimal: 194, hex: 'C2', binary: '11000010', character: 'Â', description: 'Latin capital letter A with circumflex' },
+    { decimal: 195, hex: 'C3', binary: '11000011', character: 'Ã', description: 'Latin capital letter A with tilde' },
+    { decimal: 196, hex: 'C4', binary: '11000100', character: 'Ä', description: 'Latin capital letter A with diaeresis' },
+    { decimal: 197, hex: 'C5', binary: '11000101', character: 'Å', description: 'Latin capital letter A with ring above' },
+    { decimal: 198, hex: 'C6', binary: '11000110', character: 'Æ', description: 'Latin capital letter AE' },
+    { decimal: 199, hex: 'C7', binary: '11000111', character: 'Ç', description: 'Latin capital letter C with cedilla' },
+    { decimal: 200, hex: 'C8', binary: '11001000', character: 'È', description: 'Latin capital letter E with grave' },
+    { decimal: 201, hex: 'C9', binary: '11001001', character: 'É', description: 'Latin capital letter E with acute' },
+    { decimal: 202, hex: 'CA', binary: '11001010', character: 'Ê', description: 'Latin capital letter E with circumflex' },
+    { decimal: 203, hex: 'CB', binary: '11001011', character: 'Ë', description: 'Latin capital letter E with diaeresis' },
+    { decimal: 204, hex: 'CC', binary: '11001100', character: 'Ì', description: 'Latin capital letter I with grave' },
+    { decimal: 205, hex: 'CD', binary: '11001101', character: 'Í', description: 'Latin capital letter I with acute' },
+    { decimal: 206, hex: 'CE', binary: '11001110', character: 'Î', description: 'Latin capital letter I with circumflex' },
+    { decimal: 207, hex: 'CF', binary: '11001111', character: 'Ï', description: 'Latin capital letter I with diaeresis' },
+    { decimal: 208, hex: 'D0', binary: '11010000', character: 'Ð', description: 'Latin capital letter Eth' },
+    { decimal: 209, hex: 'D1', binary: '11010001', character: 'Ñ', description: 'Latin capital letter N with tilde' },
+    { decimal: 210, hex: 'D2', binary: '11010010', character: 'Ò', description: 'Latin capital letter O with grave' },
+    { decimal: 211, hex: 'D3', binary: '11010011', character: 'Ó', description: 'Latin capital letter O with acute' },
+    { decimal: 212, hex: 'D4', binary: '11010100', character: 'Ô', description: 'Latin capital letter O with circumflex' },
+    { decimal: 213, hex: 'D5', binary: '11010101', character: 'Õ', description: 'Latin capital letter O with tilde' },
+    { decimal: 214, hex: 'D6', binary: '11010110', character: 'Ö', description: 'Latin capital letter O with diaeresis' },
+    { decimal: 215, hex: 'D7', binary: '11010111', character: '×', description: 'Multiplication sign' },
+    { decimal: 216, hex: 'D8', binary: '11011000', character: 'Ø', description: 'Latin capital letter O with stroke' },
+    { decimal: 217, hex: 'D9', binary: '11011001', character: 'Ù', description: 'Latin capital letter U with grave' },
+    { decimal: 218, hex: 'DA', binary: '11011010', character: 'Ú', description: 'Latin capital letter U with acute' },
+    { decimal: 219, hex: 'DB', binary: '11011011', character: 'Û', description: 'Latin capital letter U with circumflex' },
+    { decimal: 220, hex: 'DC', binary: '11011100', character: 'Ü', description: 'Latin capital letter U with diaeresis' },
+    { decimal: 221, hex: 'DD', binary: '11011101', character: 'Ý', description: 'Latin capital letter Y with acute' },
+    { decimal: 222, hex: 'DE', binary: '11011110', character: 'Þ', description: 'Latin capital letter Thorn' },
+    { decimal: 223, hex: 'DF', binary: '11011111', character: 'ß', description: 'Latin small letter sharp S' },
+    { decimal: 224, hex: 'E0', binary: '11100000', character: 'à', description: 'Latin small letter a with grave' },
+    { decimal: 225, hex: 'E1', binary: '11100001', character: 'á', description: 'Latin small letter a with acute' },
+    { decimal: 226, hex: 'E2', binary: '11100010', character: 'â', description: 'Latin small letter a with circumflex' },
+    { decimal: 227, hex: 'E3', binary: '11100011', character: 'ã', description: 'Latin small letter a with tilde' },
+    { decimal: 228, hex: 'E4', binary: '11100100', character: 'ä', description: 'Latin small letter a with diaeresis' },
+    { decimal: 229, hex: 'E5', binary: '11100101', character: 'å', description: 'Latin small letter a with ring above' },
+    { decimal: 230, hex: 'E6', binary: '11100110', character: 'æ', description: 'Latin small letter ae' },
+    { decimal: 231, hex: 'E7', binary: '11100111', character: 'ç', description: 'Latin small letter c with cedilla' },
+    { decimal: 232, hex: 'E8', binary: '11101000', character: 'è', description: 'Latin small letter e with grave' },
+    { decimal: 233, hex: 'E9', binary: '11101001', character: 'é', description: 'Latin small letter e with acute' },
+    { decimal: 234, hex: 'EA', binary: '11101010', character: 'ê', description: 'Latin small letter e with circumflex' },
+    { decimal: 235, hex: 'EB', binary: '11101011', character: 'ë', description: 'Latin small letter e with diaeresis' },
+    { decimal: 236, hex: 'EC', binary: '11101100', character: 'ì', description: 'Latin small letter i with grave' },
+    { decimal: 237, hex: 'ED', binary: '11101101', character: 'í', description: 'Latin small letter i with acute' },
+    { decimal: 238, hex: 'EE', binary: '11101110', character: 'î', description: 'Latin small letter i with circumflex' },
+    { decimal: 239, hex: 'EF', binary: '11101111', character: 'ï', description: 'Latin small letter i with diaeresis' },
+    { decimal: 240, hex: 'F0', binary: '11110000', character: 'ð', description: 'Latin small letter eth' },
+    { decimal: 241, hex: 'F1', binary: '11110001', character: 'ñ', description: 'Latin small letter n with tilde' },
+    { decimal: 242, hex: 'F2', binary: '11110010', character: 'ò', description: 'Latin small letter o with grave' },
+    { decimal: 243, hex: 'F3', binary: '11110011', character: 'ó', description: 'Latin small letter o with acute' },
+    { decimal: 244, hex: 'F4', binary: '11110100', character: 'ô', description: 'Latin small letter o with circumflex' },
+    { decimal: 245, hex: 'F5', binary: '11110101', character: 'õ', description: 'Latin small letter o with tilde' },
+    { decimal: 246, hex: 'F6', binary: '11110110', character: 'ö', description: 'Latin small letter o with diaeresis' },
+    { decimal: 247, hex: 'F7', binary: '11110111', character: '÷', description: 'Division sign' },
+    { decimal: 248, hex: 'F8', binary: '11111000', character: 'ø', description: 'Latin small letter o with stroke' },
+    { decimal: 249, hex: 'F9', binary: '11111001', character: 'ù', description: 'Latin small letter u with grave' },
+    { decimal: 250, hex: 'FA', binary: '11111010', character: 'ú', description: 'Latin small letter u with acute' },
+    { decimal: 251, hex: 'FB', binary: '11111011', character: 'û', description: 'Latin small letter u with circumflex' },
+    { decimal: 252, hex: 'FC', binary: '11111100', character: 'ü', description: 'Latin small letter u with diaeresis' },
+    { decimal: 253, hex: 'FD', binary: '11111101', character: 'ý', description: 'Latin small letter y with acute' },
+    { decimal: 254, hex: 'FE', binary: '11111110', character: 'þ', description: 'Latin small letter thorn' },
+    { decimal: 255, hex: 'FF', binary: '11111111', character: 'ÿ', description: 'Latin small letter y with diaeresis' }
+];
+    
+
+
+        function getAsciiInfo() {
+            const type = document.getElementById('typeSelect').value;
+            const inputValue = document.getElementById('inputValue').value.trim();
+            let result = '';
+
+            if (!inputValue) {
+                alert('Please enter a value.');
+                return;
+            }
+
+            const searchResult = asciiTable.filter(entry => {
+                if (type === 'decimal') return entry.decimal == inputValue;
+                if (type === 'hex') return entry.hex.toLowerCase() === inputValue.toLowerCase();
+                if (type === 'binary') return entry.binary === inputValue;
+                if (type === 'character') return entry.character === inputValue;
+                if (type === 'description') return entry.description.toLowerCase().includes(inputValue.toLowerCase());
+                return false;
+            });
+
+            if (searchResult.length > 0) {
+                result = `
+                    <table>
+                        <tr>
+                            <th>Decimal</th>
+                            <th>Hex</th>
+                            <th>Binary</th>
+                            <th>Character</th>
+                            <th>Description</th>
+                        </tr>
+                        ${searchResult.map(entry => `
+                            <tr>
+                                <td>${entry.decimal}</td>
+                                <td>${entry.hex}</td>
+                                <td>${entry.binary}</td>
+                                <td>${entry.character}</td>
+                                <td>${entry.description}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            } else {
+                result = `<p>No results found for "${inputValue}" in type "${type}".</p>`;
+            }
+
+            document.getElementById('result').innerHTML = result;
+            document.getElementById('suggestions').style.display = 'none'; // Hide suggestions after selection
+        }
+
+        function showSuggestions() {
+            const inputValue = document.getElementById('inputValue').value.trim().toLowerCase();
+            const type = document.getElementById('typeSelect').value;
+            const suggestionsDiv = document.getElementById('suggestions');
+
+            if (!inputValue) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            const suggestions = asciiTable.filter(entry => {
+                if (type === 'decimal') return entry.decimal.toString().startsWith(inputValue);
+                if (type === 'hex') return entry.hex.toLowerCase().startsWith(inputValue);
+                if (type === 'binary') return entry.binary.startsWith(inputValue);
+                if (type === 'character') return entry.character.toLowerCase().startsWith(inputValue);
+                if (type === 'description') return entry.description.toLowerCase().includes(inputValue);
+                return false;
+            });
+
+            if (suggestions.length > 0) {
+                suggestionsDiv.innerHTML = suggestions.map(entry => `
+                    <div onclick="selectSuggestion('${entry[type]}')">${entry[type]}</div>
+                `).join('');
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        }
+
+        function selectSuggestion(value) {
+            document.getElementById('inputValue').value = value;
+            document.getElementById('suggestions').style.display = 'none';
+        }
+        function displayCompleteTable() {
+            const tableDiv = document.getElementById('Complete-Table');
+            const tableHtml = `
+                <table>
+                    <tr>
+                        <th>Decimal</th>
+                        <th>Hex</th>
+                        <th>Binary</th>
+                        <th>Character</th>
+                        <th>Description</th>
+                    </tr>
+                    ${asciiTable.map(entry => `
+                        <tr>
+                            <td>${entry.decimal}</td>
+                            <td>${entry.hex}</td>
+                            <td>${entry.binary}</td>
+                            <td>${entry.character}</td>
+                            <td>${entry.description}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+            tableDiv.innerHTML = tableHtml;
+        }
+
+        // Display the complete ASCII table on page load
+        window.onload = displayCompleteTable;
+    </script>
+</body>
+</html>

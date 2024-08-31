@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number System Conversion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        select, input {
+            padding: 10px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Convert Any to Any Number System</h1>
+
+    <label for="inputNumber">Enter Number:</label>
+    <input type="text" id="inputNumber" placeholder="Enter number">
+
+    <br>
+
+    <label for="fromBase">From:</label>
+    <select id="fromBase">
+        <option value="2">Binary</option>
+        <option value="8">Octal</option>
+        <option value="10" selected>Decimal</option>
+        <option value="16">Hexadecimal</option>
+    </select>
+
+    <label for="toBase">To:</label>
+    <select id="toBase">
+        <option value="2">Binary</option>
+        <option value="8">Octal</option>
+        <option value="10">Decimal</option>
+        <option value="16" selected>Hexadecimal</option>
+    </select>
+
+    <br>
+
+    <button onclick="convertNumber()">Convert</button>
+
+    <div id="result"></div>
+
+    <script>
+        function convertNumber() {
+            const inputNumber = document.getElementById('inputNumber').value.trim();
+            const fromBase = parseInt(document.getElementById('fromBase').value);
+            const toBase = parseInt(document.getElementById('toBase').value);
+            
+            if (!inputNumber) {
+                alert('Please enter a number to convert.');
+                return;
+            }
+
+            // Validate the input number for the selected fromBase
+            const isValid = validateInput(inputNumber, fromBase);
+            if (!isValid) {
+                alert(`Invalid input for the base ${fromBase}. Please enter a valid number.`);
+                return;
+            }
+
+            try {
+                const decimalValue = parseInt(inputNumber, fromBase); // Convert input to decimal
+                const convertedValue = decimalValue.toString(toBase); // Convert decimal to target base
+
+                document.getElementById('result').innerText = `Result: ${convertedValue.toUpperCase()}`;
+            } catch (e) {
+                alert('Error in conversion. Please check your input.');
+            }
+        }
+
+        function validateInput(input, base) {
+            const basePattern = {
+                2: /^[01]+$/,          // Binary numbers (0-1)
+                8: /^[0-7]+$/,         // Octal numbers (0-7)
+                10: /^[0-9]+$/,        // Decimal numbers (0-9)
+                16: /^[0-9A-Fa-f]+$/   // Hexadecimal numbers (0-9, A-F)
+            };
+
+            return basePattern[base].test(input);
+        }
+    </script>
+</body>
+</html>
+
